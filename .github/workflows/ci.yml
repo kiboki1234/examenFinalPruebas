@@ -1,39 +1,88 @@
-# .github/workflows/ci-cd.yml (fragmento)
+name: CI/CD — Clima & Conversión
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+# Para que la acción de Firebase pueda comentar en el PR
+permissions:
+  contents: read
+  pull-requests: write
+
+# Evita jobs duplicados si haces pushes seguidos
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   ci:
-    name: Lint & Test
+    name: Lint & Test (coverage ≥ 80%)
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      - name: Show Node & npm versions
+      - name: Mostrar versiones
         run: |
           node -v
           npm -v
 
-      - name: Install dependencies (prefer ci)
-        run: |
-          if [ -f package-lock.json ]; then
-            echo "Using npm ci"
-            npm ci --no-audit --no-fund
-          else
-            echo "No package-lock.json found; falling back to npm install"
-            npm install --no-audit --no-fund
-          fi
+      # Importante: npm ci requiere package-lock.json sincronizado con package.json
+      # Si aquí falla con EUSAGE, alinea el lockfile localmente (rm -rf node_modules package-lock.json && npm i) y haz commit.
+      - name: Instalar dependencias (npm ci)
+        run: npm ci --no-audit --no-fund
 
       - name: Lint
         run: npm run lint
 
-      - name: Test (with coverage)
-        run: npm test
+      # Tu jest.config (o jest.config.cjs/esm) debe exigir coverageThreshold ≥ 80
+      - name: Test (con cobertura)
+        run: npm test -- --coverage
 
-      - name: Print npm debug logs on failure
+      # (Opcional) Sube el reporte de cobertura como artefacto
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            coverage
+          if-no-files-found: ignore
+
+      # Si falla npm, imprime los logs para depurar
+      - name: Dump npm debug logs on failure
         if: failure()
         run: |
-          echo "Dumping npm logs..."
+          echo "Mostrando npm debug logs..."
           find ~/.npm/_logs -type f -name '*-debug-*.log' -print -exec sed -n '1,200p' {} \;
+
+  deploy:
+    name: Firebase Hosting Deploy
+    needs: ci
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Despliega Preview en PR y Live al hacer push a main.
+      # Requisitos en "Settings > Secrets and variables > Actions":
+      # - FIREBASE_SERVICE_ACCOUNT: JSON del servicio (Admin SDK) con permisos de Hosting.
+      # - FIREBASE_PROJECT_ID: ID exacto del proyecto de Firebase.
+      - name: Deploy Preview or Production
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          projectId: '${{ secrets.FIREBASE_PROJECT_ID }}'
+          channelId: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || 'live' }}
