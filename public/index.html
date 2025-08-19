@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Perfil — Clima & Conversión</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0f172a;      /* azul oscuro */
+      --fg:#e2e8f0;      /* gris claro */
+      --acc:#22d3ee;     /* cian */
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji', sans-serif;
+      background:linear-gradient(180deg, #0b1220, var(--bg));
+      color:var(--fg); display:grid; min-height:100dvh; grid-template-rows:auto 1fr auto;
+    }
+    header, footer{
+      text-align:center; padding:1rem; background:rgba(255,255,255,0.03); backdrop-filter:saturate(140%) blur(6px);
+      border-bottom:1px solid rgba(255,255,255,0.06);
+    }
+    footer{border-top:1px solid rgba(255,255,255,0.06); border-bottom:none}
+    main{ display:grid; place-items:center; padding:2rem; }
+    .card{
+      width:min(720px, 92vw); background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);
+      border-radius:20px; padding:2rem; box-shadow:0 10px 30px rgba(0,0,0,0.35);
+    }
+    h1{ margin:0 0 0.5rem; font-size: clamp(1.6rem, 3.5vw, 2.2rem); }
+    .muted{color:#aeb8c4}
+    .badge{
+      display:inline-block; margin-top:0.5rem; background:var(--acc); color:#04252a; font-weight:800; padding:0.3rem 0.6rem; border-radius:999px; letter-spacing:.2px;
+    }
+    .section{ margin-top:1.25rem; }
+    .list{padding-left:1.2rem}
+    a{ color: var(--acc); text-decoration: none; border-bottom: 1px dotted transparent }
+    a:hover{ border-color: var(--acc) }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>Perfil — Clima & Conversión</strong>
+  </header>
+  <main>
+    <article class="card" aria-labelledby="title">
+      <h1 id="title">Andrés Espín Andrade</h1>
+      <div class="muted">NRC: <strong>XXXX</strong> · Correo: <a href="mailto:correo@espe.edu.ec">correo@espe.edu.ec</a></div>
+      <span class="badge">Estudiante · Software · QA/CI</span>
+
+      <section class="section">
+        <h2>Presentación</h2>
+        <p>
+          Soy estudiante de ingeniería de software con interés en calidad, CI/CD y pruebas automatizadas.
+          Este micrositio forma parte del proyecto <em>Clima & Conversión</em>, donde aplico buenas prácticas
+          de ingeniería: linting, pruebas con cobertura y despliegue continuo.
+        </p>
+        <p>
+          Disfruto construir utilidades simples, bien testeadas y fáciles de mantener.
+        </p>
+      </section>
+
+      <section class="section">
+        <h2>Datos personales</h2>
+        <ul class="list">
+          <li>Fan de la tipografía sans y los diseños minimalistas.</li>
+          <li>Apasionado por automatizar pipelines de calidad.</li>
+          <li>Aprendiz constante de UX accesible.</li>
+        </ul>
+      </section>
+    </article>
+  </main>
+  <footer>
+    © 2025 — Proyecto académico · Hosting en Firebase
+  </footer>
+</body>
+</html>
