@@ -1,11 +1,4 @@
-name: CI/CD
-
-on:
-  pull_request:
-    branches: [ main ]
-  push:
-    branches: [ main ]
-
+# .github/workflows/ci-cd.yml (fragmento)
 jobs:
   ci:
     name: Lint & Test
@@ -16,29 +9,31 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
-      - name: Install
-        run: npm ci
+      - name: Show Node & npm versions
+        run: |
+          node -v
+          npm -v
+
+      - name: Install dependencies (prefer ci)
+        run: |
+          if [ -f package-lock.json ]; then
+            echo "Using npm ci"
+            npm ci --no-audit --no-fund
+          else
+            echo "No package-lock.json found; falling back to npm install"
+            npm install --no-audit --no-fund
+          fi
 
       - name: Lint
         run: npm run lint
 
-      - name: Test (with coverage ≥ 80%)
+      - name: Test (with coverage)
         run: npm test
 
-  deploy:
-    name: Deploy Firebase Hosting
-    needs: ci
-    runs-on: ubuntu-latest
-    if: ${{ success() }}
-    steps:
-      - uses: actions/checkout@v4
-
-      # Previews para PR y producción para main
-      - name: Deploy Preview or Production
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
-          projectId: '${{ secrets.FIREBASE_PROJECT_ID }}'
-          channelId: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || 'live' }}
+      - name: Print npm debug logs on failure
+        if: failure()
+        run: |
+          echo "Dumping npm logs..."
+          find ~/.npm/_logs -type f -name '*-debug-*.log' -print -exec sed -n '1,200p' {} \;
