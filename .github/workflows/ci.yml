@@ -70,15 +70,9 @@ jobs:
     needs: ci
     if: ${{ success() }}
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # Despliega Preview en PR y Live al hacer push a main.
-      # Requisitos en "Settings > Secrets and variables > Actions":
-      # - FIREBASE_SERVICE_ACCOUNT: JSON del servicio (Admin SDK) con permisos de Hosting.
-      # - FIREBASE_PROJECT_ID: ID exacto del proyecto de Firebase.
       - name: Deploy Preview or Production
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:

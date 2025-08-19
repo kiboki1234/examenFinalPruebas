@@ -75,4 +75,19 @@
     © 2025 — Proyecto académico · Hosting en Firebase
   </footer>
 </body>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBEj410iuiVoMR-f02ALkvkYXnSsUdjwfs",
+    authDomain: "examenpruebas-2c672.firebaseapp.com",
+    projectId: "examenpruebas-2c672",
+    storageBucket: "examenpruebas-2c672.appspot.com",  // ✅ corregido
+    messagingSenderId: "47498406252",
+    appId: "1:47498406252:web:058b58afef81606edd2b49"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  console.log("Firebase OK:", app.name);
+</script>
 </html>
